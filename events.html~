@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<script src="js/underscore.min.js" type="text/javascript"></script>
+	<script src="js/jquery-1.6.3.min.js" type="text/javascript"></script>
+	<script src="js/json2.js" type="text/javascript"></script>
+	<script src="js/backbone-min.js" type="text/javascript"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		(function($,undefined){
+		 	var object ={};
+			_.extend(object, Backbone.Events);
+			object.bind("alert", function(msg){
+				alert("Triggered " + msg);
+			});
+			object.trigger("alert", "an event");
+		 })(jQuery);	
+	</script>
+</body>
+</html>

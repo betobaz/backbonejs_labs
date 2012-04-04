@@ -1,0 +1,9 @@
+var myString = "Hello Backbone.js";
+
+test("Our first QUnit test - asserting results", function(){
+	ok(true, "the test succeeds");
+	ok(false, "the test fails");
+
+	equal(myString, "Hello Backbone.js", "The value expected is Hello Backbone.js!");
+
+});
