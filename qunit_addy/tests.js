@@ -132,3 +132,20 @@ test( "1 passed as an argument", 3, function(){
 	equal( items.eq(3).text(), "4. am", "fourth item should has index 4" );
 	equal( items.eq(4).text(), "5. foo", "fifth item should has index 5" );
 });
+
+test( "An async test", function(){
+	stop();
+	expect( 1 );
+	$.ajax({
+		url: "/backbone_dev/qunit_addy/test.json",
+		dataType: "json",
+		success: function( data ){
+			deepEqual( data, {
+				topic: "hello",
+				message: "hi there!"
+			} );
+			start();			
+		}
+	});
+	
+} )
