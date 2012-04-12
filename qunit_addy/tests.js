@@ -133,6 +133,7 @@ test( "1 passed as an argument", 3, function(){
 	equal( items.eq(4).text(), "5. foo", "fifth item should has index 5" );
 });
 
+module( "Test async" );
 test( "An async test", function(){
 	stop();
 	expect( 1 );
@@ -148,4 +149,15 @@ test( "An async test", function(){
 		}
 	});
 	
+} );
+
+module( "Test with spies by SinonJS" );
+test( "should call all subscribers for a message exactly once", function(){
+	var message = "bla bal bla bla",
+		spy = this.spy();
+
+	PubSub.subscribe( message, spy );
+	PubSub.publishSync( message, "Hello" );
+
+	ok( spy.calledOnce, "The subscriber was called once" );
 } )
