@@ -160,4 +160,22 @@ test( "should call all subscribers for a message exactly once", function(){
 	PubSub.publishSync( message, "Hello" );
 
 	ok( spy.calledOnce, "The subscriber was called once" );
+} );
+
+test( "Should inspect jQuery.getJSON's usage of jQuery.ajax", function(){
+	this.spy( jQuery, "ajax");
+	jQuery.getJSON( "/backbone_dev/qunit_addy/test.json" );
+	ok( jQuery.ajax.calledOnce );
+	equals( jQuery.ajax.getCall(0).args[0].url, "/backbone_dev/qunit_addy/test.json");
+	equals( jQuery.ajax.getCall(0).args[0].dataType, "json");
+	
+} );
+
+test( "Should call a subscriber with standar marching", function(){
+	var spy = sinon.spy();
+	PubSub.subscribe( "message", spy );
+	PubSub.publishSync( "message", { id: 45 } );
+	ok( spy.calledOnce );
+	ok( spy.calledWithExactly( "message", { id: 45 } ) );
+
 } )
