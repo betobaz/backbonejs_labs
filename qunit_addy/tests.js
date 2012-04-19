@@ -178,4 +178,99 @@ test( "Should call a subscriber with standar marching", function(){
 	ok( spy.calledOnce );
 	ok( spy.calledWithExactly( "message", { id: 45 } ) );
 
-} )
+} );
+
+test( "Should call a subscriber with strict matching", function(){
+	var spy = sinon.spy();
+	PubSub.subscribe( "message", spy );
+	PubSub.publishSync( "message", "many", "arguments" );
+	PubSub.publishSync( "message", 12, 34 );
+
+	// This passes
+	ok( spy.calledWith( "many" ));
+
+	// This however, fails
+	ok( spy.calledWithExactly( "many" ));
+});
+
+test( "Shoud call a subscribe and mantain call order", function(){
+	var a = sinon.spy(),
+		b = sinon.spy();
+
+	// This would fail as b was called after a
+	PubSub.subscribe( "message", a);
+	PubSub.subscribe( "message", b);
+	PubSub.publishSync( "message", {id: 45} );
+	PubSub.publishSync( "event", [1,2,3] );
+	ok( a.calledBefore(b) );
+	ok( a.calledAfter(a) );
+
+} );
+
+test( "Should call a subscribe and check call counts", function(){
+	var message = "hola20120419",
+		spy = this.spy();
+		PubSub.subscribe( message, spy );
+		PubSub.publishSync( message, "some payload" );
+		// Passes if spy was called  once and only once.
+		ok( spy.calledOnce ); // calledTwice and CalledThrice are also soppoted
+		// The number of recorded calls
+		equal( spy.callCount, 1 );
+		// Directly checking the arguments of the call
+		equals( spy.getCall(0).args[0], message);
+
+} );
+
+var Todo = Backbone.Model.extend({
+		id: null,
+		title: null
+	}),
+	TodoList = Backbone.Collection.extend({  
+	    model: Todo  
+	});  
+// Let's assume our instance of this collection is  
+//this.todoList; */
+module( "Shoud function when instantiated wit model literals" ,{
+	setup: function(){
+		this.todoStub = sinon.stub( window, "Todo" );
+		this.model = new Backbone.Model({
+			id: 2,
+			title: "Hello world"
+		});
+
+		this.todoStub.return( this.model );
+		this.todos = new TodoList();
+
+		// Let's reset the relationship to use a stub
+		this.todos.model = Todo;
+		this.todos.add({
+			id: 2,
+			title: "Hello world"
+		})
+	},
+	teardown: function(){
+		this.todoStub.restore();
+	}
+});
+
+test( "should add a model", function(){
+	equal( this.todos.length, 1);
+} );
+test( "should find a model by id", function(){
+	equal( this.todos.get(5).get("id"), 5);
+});
+
+module( "Mocks" );
+test( "should call all subscribers when exception", function(){
+	var myAPI = { clearTodo: function(){} },
+		spy = this.spy(),
+		mock = this.mock( myAPI );
+	mock.expects( "clearTodo" ).once().throws();
+	PubSub.subscribe( "message", myAPI.clearTodo );
+	PubSub.subscribe( "message", spy );
+	PubSub.publishSync( "message", undefined );
+	mock.verify();
+	ok( spy.calledOnce );
+
+
+});
